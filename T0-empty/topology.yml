@@ -25,15 +25,15 @@ addressing:
   ixp_lan:
     ipv4: 100.70.70.0/24
     prefix: 24
-  # WINstagram pool (let's assume WINstagram will have reserved 40.40.40.0/24)
+  # WINstagram pool (let's assume WINstagram will have reserved 100.80.44.0/24)
   wins_lan:
     ipv4: 100.80.44.0/24
     prefix: 24
-  # Newspaper-X pool (let's assume Newspaper-X will have reserved 50.50.50.0/24)
+  # Newspaper-X pool (let's assume Newspaper-X will have reserved 100.90.55.0/24)
   nx_lan:
     ipv4: 100.90.55.0/24
     prefix: 24
-  # ACME pools (from 1.100.0.0/20 - 1.100.0.0-1.100.15.255)
+  # ACME pools (from 100.100.0.0/20 - 100.100.0.0-100.100.15.255)
   # loopbacks (need to override main loopback pool) - let's use the first /24 for loopbacks
   loopback:
     ipv4: 100.100.0.0/24
