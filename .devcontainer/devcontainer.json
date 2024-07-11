@@ -1,0 +1,16 @@
+{
+    "image": "ghcr.io/ipspace/netlab/devcontainer:1.8.4",
+    "hostRequirements": {
+        "cpus": 2,
+        "memory": "8gb",
+        "storage": "32gb"
+    },
+    "forwardPorts": [ 5001 ],
+    "portsAttributes": {
+        "5001": {
+            "label": "Edgeshark",
+            "onAutoForward": "openBrowser"
+        }
+    },
+    "postAttachCommand": "./.devcontainer/post-up.sh"
+}
