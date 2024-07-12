@@ -5,6 +5,7 @@ defaults:
   provider: clab
   # when running on github codespaces we cannot use VRFs...
   devices.frr.clab.group_vars.netlab_mgmt_vrf: false
+  devices.frr.clab.image: quay.io/frrouting/frr:7.5.0   # The last image that handles loopbacks correctly
 plugin: [ bgp.session, bgp.policy ]
 
 
@@ -102,6 +103,11 @@ nodes:
     id: 32
     loopback:
       ipv4: 100.72.2.2/32
+# IXP Route Server
+  ixp_rs:
+    id: 70
+    loopback:
+      ipv4: 100.70.71.72/32
 # WINstagram
   winsrt:
     id: 40
@@ -174,6 +180,13 @@ groups:
     bgp:
       as: 65002
       originate: [ 100.72.0.0/16 ]
+  ixp_rs_g:
+    members: [ ixp_rs ]
+    module: [ bgp ]
+    bgp:
+      as: 64777
+      rs: True
+      advertise_loopback: false
   w_routers:
     members: [ winsrt ]
     module: [ bgp ]
@@ -254,7 +267,8 @@ links:
   igw1:
     bgp:
       remove_private_as: true
-      med: 100
+      # workaround: let's use prepend 1 just to generate route-maps that will be used for filtering
+      prepend.count: 1
       locpref: 100
   pool: t1_p2p
 
@@ -263,7 +277,8 @@ links:
   igw2:
     bgp:
       remove_private_as: true
-      med: 500
+      # workaround: since we used prepend 1 before, let's prepend 2 here
+      prepend.count: 2
       locpref: 50
   pool: t2_p2p
 
@@ -277,6 +292,7 @@ links:
     bgp:
       med: 20
       locpref: 200
+  ixp_rs:
   pool: ixp_lan
 
 # ACME Customers
@@ -285,6 +301,7 @@ links:
 - corp1:
     bgp:
       advertise: true
+      # workaround: set a local pref to have netlab generate a route map where we can put input filters
       locpref: 10
   c1rt:
     bgp:
@@ -294,6 +311,7 @@ links:
 - corp2:
     bgp:
       advertise: true
+      # workaround: set a local pref to have netlab generate a route map where we can put input filters
       locpref: 10
   c1rt:
     bgp:
@@ -316,14 +334,14 @@ links:
 - transit1:
   winsrt:
     bgp:
-      med: 100
-      locpref: 100
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t1_p2p
 - transit2:
   winsrt:
     bgp:
-      med: 500
-      locpref: 50
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t2_p2p
 - winsrt:
     bgp.advertise: true
@@ -334,14 +352,14 @@ links:
 - transit1:
   nxrt:
     bgp:
-      med: 100
-      locpref: 100
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t1_p2p
 - transit2:
   nxrt:
     bgp:
-      med: 500
-      locpref: 50
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t2_p2p
 - nxrt:
     bgp.advertise: true

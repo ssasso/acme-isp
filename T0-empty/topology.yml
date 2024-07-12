@@ -5,6 +5,7 @@ defaults:
   provider: clab
   # when running on github codespaces we cannot use VRFs...
   devices.frr.clab.group_vars.netlab_mgmt_vrf: false
+  devices.frr.clab.image: quay.io/frrouting/frr:7.5.0   # The last image that handles loopbacks correctly
 
 # let's start the required FRR daemons on all frr containers.
 plugin: [ fix_frr ]
@@ -103,6 +104,11 @@ nodes:
     id: 32
     loopback:
       ipv4: 100.72.2.2/32
+# IXP Route Server
+  ixp_rs:
+    id: 70
+    loopback:
+      ipv4: 100.70.71.72/32
 # WINstagram
   winsrt:
     id: 40
@@ -198,6 +204,7 @@ links:
 ## ixp - policy: this needs to be preferred over all transits.
 - ixp:
   winsrt:
+  ixp_rs:
   pool: ixp_lan
 
 # ACME Customers
