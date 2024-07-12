@@ -1,0 +1,11 @@
+members:
+- core1
+- core2
+module: [ ospf, bgp ]
+config: [ extra/bgp-add-path.j2 ]
+bgp:
+  as: 64666
+  advertise_loopback: true
+  rr: true
+  # generate the aggregate route
+  originate: [ 100.100.0.0/20 ]

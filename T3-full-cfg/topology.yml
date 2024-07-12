@@ -6,8 +6,7 @@ defaults:
   # when running on github codespaces we cannot use VRFs...
   devices.frr.clab.group_vars.netlab_mgmt_vrf: false
   devices.frr.clab.image: quay.io/frrouting/frr:7.5.0   # The last image that handles loopbacks correctly
-plugin: [ bgp.session, bgp.policy ]
-
+plugin: [ fix_frr, bgp.session, bgp.policy ]
 
 # address pools
 ## let's define here the main address pools that will be used on the links
@@ -122,6 +121,7 @@ nodes:
 # Newspaper-X
   nxrt:
     id: 50
+    ignore_bgp_configuration: true
     loopback:
       ipv4: 100.90.90.90/32
   nxweb:
@@ -133,75 +133,12 @@ nodes:
 
 
 #### GROUP SETTINGS BELOW. Used to define modules and testing configuration.
-#### Comment this for normal workshop usage.
+#### Comment this for normal workshop usage (or include only partial group config).
 ###### BGP Policy tweaks:
 ###### - we need to create, on border routers, fake med/local_preferences, to have a route-map attached to the neighbor config.
 groups:
-  acme_core:
-    members:
-    - core1
-    - core2
-    module: [ ospf, bgp ]
-    config: [ extra/bgp-add-path.j2 ]
-    bgp:
-      as: 64666
-      advertise_loopback: true
-      rr: true
-      # generate the aggregate route
-      originate: [ 100.100.0.0/20 ]
-  acme_rt:
-    members:
-    - igw1
-    - igw2
-    - ixp
-    - corp1
-    - corp2
-    - bras
-    module: [ ospf, bgp ]
-    config: [ extra/bgp-add-path.j2, extra ]
-    bgp:
-      as: 64666
-      advertise_loopback: true
-  c1_routers:
-    members: [ c1rt ]
-    module: [ bgp ]
-    config: [ extra ]
-    bgp:
-      as: 65535
-  t1_routers:
-    members: [ transit1 ]
-    module: [ bgp ]
-    bgp:
-      as: 65001
-      originate: [ 100.71.0.0/16 ]
-  t2_routers:
-    members: [ transit2 ]
-    module: [ bgp ]
-    bgp:
-      as: 65002
-      originate: [ 100.72.0.0/16 ]
-  ixp_rs_g:
-    members: [ ixp_rs ]
-    module: [ bgp ]
-    bgp:
-      as: 64777
-      rs: True
-      advertise_loopback: false
-  w_routers:
-    members: [ winsrt ]
-    module: [ bgp ]
-    config: [ extra ]
-    bgp:
-      as: 65040
-      advertise_loopback: false
-  n_routers:
-    members: [ nxrt ]
-    module: [ bgp ]
-    config: [ extra ]
-    bgp:
-      as: 65050
-      advertise_loopback: false
-
+  _include:
+  - _groups/*.yml
 
 # definition of all the links between the different virtual devices
 links:

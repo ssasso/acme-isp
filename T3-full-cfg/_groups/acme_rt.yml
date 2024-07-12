@@ -1,0 +1,12 @@
+members:
+- igw1
+- igw2
+- ixp
+- corp1
+- corp2
+- bras
+module: [ ospf, bgp ]
+config: [ extra/bgp-add-path.j2, extra ]
+bgp:
+  as: 64666
+  advertise_loopback: true

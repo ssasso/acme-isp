@@ -1,0 +1,5 @@
+members: [ c1rt ]
+module: [ bgp ]
+config: [ extra ]
+bgp:
+  as: 65535

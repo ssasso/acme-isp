@@ -1,0 +1,5 @@
+members: [ transit2 ]
+module: [ bgp ]
+bgp:
+  as: 65002
+  originate: [ 100.72.0.0/16 ]

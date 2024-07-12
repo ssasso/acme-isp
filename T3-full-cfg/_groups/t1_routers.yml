@@ -1,0 +1,5 @@
+members: [ transit1 ]
+module: [ bgp ]
+bgp:
+  as: 65001
+  originate: [ 100.71.0.0/16 ]

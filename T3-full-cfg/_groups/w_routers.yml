@@ -1,0 +1,6 @@
+members: [ winsrt ]
+module: [ bgp ]
+config: [ extra ]
+bgp:
+  as: 65040
+  advertise_loopback: false

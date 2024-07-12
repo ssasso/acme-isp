@@ -1,0 +1,6 @@
+members: [ ixp_rs ]
+module: [ bgp ]
+bgp:
+  as: 64777
+  rs: True
+  advertise_loopback: false

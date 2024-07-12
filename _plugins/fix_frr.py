@@ -31,7 +31,7 @@ def post_node_transform(topology: Box) -> None:
     # do it only for frr which has no bgp module already activated
     if rtr.device == 'frr' and not 'bgp' in rtr:
       strings.print_colored_text('[FIX_FRR]  ','yellow','FIX_FRR ')
-      print(f"on node {n}")
+      print(f"updating daemons on node {n}")
       rtr.clab.pop('config_templates', None)
       rtr.clab.binds = []
       rtr.clab.binds.append('frr-daemons:/etc/frr/daemons')
@@ -45,3 +45,22 @@ your device and start configuring BGP.
 '''
 
   return
+
+
+def init(topology: Box) -> None:
+    # Define custom data for node, to be used to cleanup bgp config
+    topology.defaults.attributes.node.ignore_bgp_configuration = None
+    return
+
+def post_transform(topology: Box) -> None:
+  for n in topology.nodes:
+    rtr = topology.nodes[n]
+    # remove the BGP config if the attribute 'ignore_bgp_configuration' is set to true
+    if rtr.device == 'frr' and 'bgp' in rtr and rtr.get('ignore_bgp_configuration', False):
+      strings.print_colored_text('[FIX_FRR]  ','yellow','FIX_FRR ')
+      print(f"removing non-essential BGP config on node {n}")
+      bgp_to_keep = [ 'as', 'ipv4', 'ipv6', 'router_id' ]
+      current_bgp_items = list(rtr['bgp'].keys())
+      for bgp_item in current_bgp_items:
+        if bgp_item not in bgp_to_keep:
+          del rtr['bgp'][bgp_item]
