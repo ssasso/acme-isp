@@ -58,16 +58,60 @@ pfx_tr2_bgp:
   nodes: [ core1, core2 ]
   plugin: bgp_prefix(nodes.transit2.loopback.ipv4)
 
-
-
-
-
-c1prefix:
+c1_prefix:
   description: Check the propagation of Customer 1 prefixes
   fail: Customer 1 prefix is not visible on the core router
   pass: Core router is receiving prefixes from Customer 1
   nodes: [ core1, core2 ]
-  show:
-    frr: bgp ipv4 regexp 65535 json
-  valid:
-    frr: routes
+  plugin: bgp_prefix('100.100.15.0/24',aspath='65535')
+
+aspath_t1:
+  description: Check correct AS-Path on Transit-1
+  nodes: [ transit1 ]
+  plugin: bgp_prefix('100.100.0.0/20',aspath='64666 64666')
+
+aspath_t2:
+  description: Check correct AS-Path on Transit-2
+  nodes: [ transit2 ]
+  plugin: bgp_prefix('100.100.0.0/20',aspath='64666 64666 64666')
+
+c1_bestpath:
+  description: Check correct Best Path on Customer-1 Router
+  nodes: [ c1rt ]
+  plugin: bgp_prefix('100.100.0.0/20',peer=nodes.corp1.bgp.router_id,best=True)
+
+best_to_wins:
+  description: Check correct Best Path TO WINstagram
+  nodes: [ core1 ]
+  plugin: bgp_prefix('100.80.44.0/24',peer=nodes.ixp.bgp.router_id,aspath='65040',best=True)
+
+best_from_wins:
+  description: Check correct Best Path FROM WINstagram
+  nodes: [ winsrt ]
+  plugin: bgp_prefix('100.100.0.0/20',nh=nodes.ixp.interfaces[2].ipv4,best=True)
+
+best_to_nx:
+  description: Check correct Best Path TO Newspaper-X
+  nodes: [ core1 ]
+  plugin: bgp_prefix('100.90.55.0/24',peer=nodes.igw1.bgp.router_id,best=True)
+
+best_from_nx:
+  description: Check correct Best Path FROM Newspaper-X
+  nodes: [ nxrt ]
+  plugin: bgp_prefix('100.100.0.0/20',peer=nodes.transit1.bgp.router_id,aspath='65001 64666 64666',best=True)
+
+ping_wins:
+  description: Pinging WINstagram Web Server
+  nodes: [ c1host, c2host, c3host ]
+  devices: [ linux ]
+  exec: ping -c 10 winsweb -A
+  valid: |
+    "64 bytes" in stdout
+
+ping_nx:
+  description: Pinging Newspaper-X Web Server
+  nodes: [ c1host, c2host, c3host ]
+  devices: [ linux ]
+  exec: ping -c 10 nxweb -A
+  valid: |
+    "64 bytes" in stdout
