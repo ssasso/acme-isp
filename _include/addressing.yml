@@ -1,0 +1,45 @@
+# address pools
+## let's define here the main address pools that will be used on the links
+## some pools will contain only one subnet, some others will contain multiple subnets
+##  that will be dynamically allocated to the different links using it.
+
+# Transit 1 & 2 P2P Links (let's assume 100.71.x.x for T1 and 100.72.x.x for T2)
+t1_p2p:
+  ipv4: 100.71.0.0/24
+  prefix: 30
+t2_p2p:
+  ipv4: 100.72.0.0/24
+  prefix: 30
+# Internet Exchange LAN
+ixp_lan:
+  ipv4: 100.70.70.0/24
+  prefix: 24
+# WINstagram pool (let's assume WINstagram will have reserved 100.80.44.0/24)
+wins_lan:
+  ipv4: 100.80.44.0/24
+  prefix: 24
+# Newspaper-X pool (let's assume Newspaper-X will have reserved 100.90.55.0/24)
+nx_lan:
+  ipv4: 100.90.55.0/24
+  prefix: 24
+# ACME pools (from 100.100.0.0/20 - 100.100.0.0-100.100.15.255)
+# loopbacks (need to override main loopback pool) - let's use the first /24 for loopbacks
+loopback:
+  ipv4: 100.100.0.0/24
+  prefix: 32
+## ACME p2p (internal)
+acme_p2p:
+  ipv4: 100.100.1.0/24
+  prefix: 30
+## ACME p2p (towards business customers)
+acme_p2p_cust:
+  ipv4: 100.100.2.0/24
+  prefix: 30
+## BRAS Dynamic Pool for residential customers
+bras_lan:
+  ipv4: 100.100.3.0/24
+  prefix: 24
+## Customer 1 Delegated Pool
+cust1_lan:
+  ipv4: 100.100.15.0/24
+  prefix: 24

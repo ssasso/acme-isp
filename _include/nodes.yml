@@ -1,0 +1,74 @@
+# definition of nodes/virtual devices and specific attributes
+## `id` attribute is not mandatory, but we can set it to control which loopback address will be used by every router
+## NOTE: every node (apart from linux hosts) will be assigned a loopback address by default.
+
+# ACME ISP
+core1:
+  id: 1
+core2:
+  id: 2
+igw1:
+  id: 11
+igw2:
+  id: 12
+ixp:
+  id: 13
+corp1:
+  id: 14
+corp2:
+  id: 15
+bras:
+  id: 16
+# ACME Customers
+## Customer 1, Routers + Host
+c1rt:
+  id: 20
+c1host:
+  id: 21
+  device: linux
+  image: ssasso/netlab-linux-host:latest
+## Customer 2 and 3, only Hosts
+c2host:
+  id: 22
+  device: linux
+  image: ssasso/netlab-linux-host:latest
+c3host:
+  id: 23
+  device: linux
+  image: ssasso/netlab-linux-host:latest
+# Transit Providers
+transit1:
+  id: 31
+  loopback:
+    ipv4: 100.71.1.1/32
+transit2:
+  id: 32
+  loopback:
+    ipv4: 100.72.2.2/32
+# IXP Route Server
+ixp_rs:
+  id: 70
+  loopback:
+    ipv4: 100.70.71.72/32
+# WINstagram
+winsrt:
+  id: 40
+  loopback:
+    ipv4: 100.80.80.80/32
+winsweb:
+  id: 44
+  device: linux
+  image: ssasso/pyweb:latest
+  clab.env:
+    WEB_MESSAGE: 'Hey, this is WINstagram!'
+# Newspaper-X
+nxrt:
+  id: 50
+  loopback:
+    ipv4: 100.90.90.90/32
+nxweb:
+  id: 55
+  device: linux
+  image: ssasso/pyweb:latest
+  clab.env:
+    WEB_MESSAGE: 'Welcome to Newspaper-X.'

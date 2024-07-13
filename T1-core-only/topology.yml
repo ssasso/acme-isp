@@ -191,3 +191,15 @@ links:
 - transit1:
   transit2:
   pool: t1_p2p
+
+
+
+# IGNORE ROUTING CONFIG ON THE FOLLOWING DEVICES (handled by custom plugin fix_frr):
+
+remove_routing_group_data:
+- c1_routers
+- ixp_rs_g
+- n_routers
+- t1_routers
+- t2_routers
+- w_routers

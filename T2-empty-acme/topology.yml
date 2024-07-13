@@ -2,8 +2,7 @@
 # netlab default info for provider and device type
 defaults.sources.extra: [ ../_include/netlab-defaults.yml ]
 
-# let's start the required FRR daemons on all frr containers.
-plugin: [ fix_frr ]
+plugin: [ fix_frr, bgp.session, bgp.policy ]
 
 # Include reusable components:
 # - addressing pools
@@ -14,6 +13,14 @@ _include:
 - ../_include/addressing.yml
 - ../_include/nodes.yml
 - ../_include/validate.yml
+
+#### GROUP SETTINGS BELOW. Used to define modules and testing configuration.
+#### Comment this for normal workshop usage (or include only partial group config).
+###### BGP Policy tweaks:
+###### - we need to create, on border routers, fake med/local_preferences, to have a route-map attached to the neighbor config.
+groups:
+  _include:
+  - ../_include/_groups/*.yml
 
 # Unfortunately we cannot treat links as reusable components
 
@@ -79,16 +86,33 @@ links:
 ## transit 1 - policy: this needs to be preferred over transit 2
 - transit1:
   igw1:
+    bgp:
+      remove_private_as: true
+      # workaround: let's use prepend 1 just to generate route-maps that will be used for filtering
+      prepend.count: 1
+      locpref: 100
   pool: t1_p2p
 
 ## transit 2 - policy: backup transit
 - transit2:
   igw2:
+    bgp:
+      remove_private_as: true
+      # workaround: since we used prepend 1 before, let's prepend 2 here
+      prepend.count: 2
+      locpref: 50
   pool: t2_p2p
 
 ## ixp - policy: this needs to be preferred over all transits.
 - ixp:
+    bgp:
+      remove_private_as: true
+      med: 20
+      locpref: 200
   winsrt:
+    bgp:
+      med: 20
+      locpref: 200
   ixp_rs:
   pool: ixp_lan
 
@@ -96,17 +120,33 @@ links:
 
 ## Cust-1
 - corp1:
+    bgp:
+      advertise: true
+      # workaround: set a local pref to have netlab generate a route map where we can put input filters
+      locpref: 10
   c1rt:
+    bgp:
+      med: 20
+      locpref: 200
   pool: acme_p2p_cust
 - corp2:
+    bgp:
+      advertise: true
+      # workaround: set a local pref to have netlab generate a route map where we can put input filters
+      locpref: 10
   c1rt:
+    bgp:
+      med: 100
+      locpref: 100
   pool: acme_p2p_cust
 - c1rt:
+    bgp.advertise: true
   c1host:
   pool: cust1_lan
 
 ## BRAS "dynamic" LAN
 - bras:
+    bgp.advertise: true
   c2host:
   c3host:
   pool: bras_lan
@@ -114,22 +154,36 @@ links:
 # WINstagram
 - transit1:
   winsrt:
+    bgp:
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t1_p2p
 - transit2:
   winsrt:
+    bgp:
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t2_p2p
 - winsrt:
+    bgp.advertise: true
   winsweb:
   pool: wins_lan
 
 # Newspaper-X
 - transit1:
   nxrt:
+    bgp:
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t1_p2p
 - transit2:
   nxrt:
+    bgp:
+      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
+      med: 1
   pool: t2_p2p
 - nxrt:
+    bgp.advertise: true
   nxweb:
   pool: nx_lan
 
@@ -137,3 +191,11 @@ links:
 - transit1:
   transit2:
   pool: t1_p2p
+
+
+
+# IGNORE ROUTING CONFIG ON THE FOLLOWING DEVICES (handled by custom plugin fix_frr):
+
+remove_routing_group_data:
+- acme_core
+- acme_rt

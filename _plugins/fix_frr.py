@@ -48,19 +48,61 @@ your device and start configuring BGP.
 
 
 def init(topology: Box) -> None:
-    # Define custom data for node, to be used to cleanup bgp config
-    topology.defaults.attributes.node.ignore_bgp_configuration = None
+    # Define custom global item, to be used to cleanup routing config
+    topology.defaults.attributes['global']['ignore_routing_configuration_on_nodes'] = {
+      'type': 'list',
+      '_subtype': 'str',
+    }
+    topology.defaults.attributes['global']['remove_routing_group_data'] = {
+      'type': 'list',
+      '_subtype': 'str',
+    }
     return
 
 def post_transform(topology: Box) -> None:
-  for n in topology.nodes:
-    rtr = topology.nodes[n]
-    # remove the BGP config if the attribute 'ignore_bgp_configuration' is set to true
-    if rtr.device == 'frr' and 'bgp' in rtr and rtr.get('ignore_bgp_configuration', False):
+  # remove the BGP/OSPF config for specific nodes
+  for ignore_rt_node in topology.get('ignore_routing_configuration_on_nodes', []):
+    if ignore_rt_node in topology.nodes and topology.nodes[ignore_rt_node].device == 'frr':
+      rtr = topology.nodes[ignore_rt_node]
+      # BGP Stuff
+      if 'bgp' in rtr:
+        strings.print_colored_text('[FIX_FRR]  ','yellow','FIX_FRR ')
+        print(f"removing non-essential ROUTING config on node {ignore_rt_node}")
+        bgp_to_keep = [ 'as', 'ipv4', 'ipv6', 'router_id' ]
+        bgp_to_force_append = {
+          'neighbors': [],
+          'advertise_loopback': False,
+        }
+        current_bgp_items = list(rtr['bgp'].keys())
+        for bgp_item in current_bgp_items:
+          if bgp_item not in bgp_to_keep:
+            del rtr['bgp'][bgp_item]
+        for a, av in bgp_to_force_append.items():
+          rtr['bgp'][a] = av
+        for i in rtr.interfaces:
+          if 'bgp' in i:
+            del i['bgp']
+      # OSPF Stuff
+      if 'ospf' in rtr:
+        # delete ospf loopback data
+        del rtr.loopback['ospf']
+        # delete ospf data from interfaces
+        for i in rtr.interfaces:
+          if 'ospf' in i:
+            del i['ospf']
+
+def pre_transform(topology: Box) -> None:
+  # remove non-needed groups
+  for g_to_del in topology.get('remove_routing_group_data', []):
+    if g_to_del in topology.groups:
       strings.print_colored_text('[FIX_FRR]  ','yellow','FIX_FRR ')
-      print(f"removing non-essential BGP config on node {n}")
-      bgp_to_keep = [ 'as', 'ipv4', 'ipv6', 'router_id' ]
-      current_bgp_items = list(rtr['bgp'].keys())
-      for bgp_item in current_bgp_items:
-        if bgp_item not in bgp_to_keep:
-          del rtr['bgp'][bgp_item]
+      print(f"removing group data for {g_to_del}")
+      # append members to 'topology.ignore_routing_configuration_on_nodes' (and make it unique)
+      if 'ignore_routing_configuration_on_nodes' not in topology:
+        topology['ignore_routing_configuration_on_nodes'] = []
+      for m in topology.groups[g_to_del].get('members', []):
+        topology['ignore_routing_configuration_on_nodes'].append(m)
+      del topology.groups[g_to_del]
+  # if present, make ignore_routing_configuration_on_nodes unique
+  if 'ignore_routing_configuration_on_nodes' in topology:
+    topology['ignore_routing_configuration_on_nodes'] = list(set(topology['ignore_routing_configuration_on_nodes']))
