@@ -25,14 +25,12 @@ ibgp_c1:
   fail: IBGP session to CORE-1 is not established
   nodes: [ core2, igw1, igw2, ixp, corp1, corp2, bras ]
   plugin: bgp_neighbor(node.bgp.neighbors,'core1')
-  stop_on_error: True
 
 ibgp_c2:
   description: Check IBGP session towards CORE-2
   fail: IBGP session to CORE-2 is not established
   nodes: [ core1, igw1, igw2, ixp, corp1, corp2, bras ]
   plugin: bgp_neighbor(node.bgp.neighbors,'core2')
-  stop_on_error: True
 
 bgp_igw1_transit:
   description: Check the IGW-1 - TRANSIT-1 EBGP session
@@ -75,10 +73,15 @@ aspath_t2:
   nodes: [ transit2 ]
   plugin: bgp_prefix('100.100.0.0/20',aspath='64666 64666 64666')
 
-c1_bestpath:
-  description: Check correct Best Path on Customer-1 Router
+c1_best_out:
+  description: Check correct Best Path from Customer-1 Router
   nodes: [ c1rt ]
   plugin: bgp_prefix('100.100.0.0/20',peer=nodes.corp1.bgp.router_id,best=True)
+
+c1_best_in:
+  description: Check correct Best Path to Customer-1 Router
+  nodes: [ core1, core2 ]
+  plugin: bgp_prefix('100.100.15.0/24',peer=nodes.corp1.bgp.router_id,med=20,best=True)
 
 best_to_wins:
   description: Check correct Best Path TO WINstagram
