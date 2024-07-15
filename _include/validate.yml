@@ -1,9 +1,14 @@
 # Validate ACME LAB
 ---
 
-ospf_c1_c2:
-  description: Check the CORE-1 to CORE-2 OSPF session
-  nodes: [ core1 ]
+ospf_c1:
+  description: Check CORE-1 OSPF neighbor
+  nodes: [ core2, igw1, igw2, ixp, corp1, corp2, bras ]
+  plugin: ospf_neighbor(nodes.core1.ospf.router_id)
+
+ospf_c2:
+  description: Check CORE-2 OSPF neighbor
+  nodes: [ core1, igw1, igw2, ixp, corp1, corp2, bras ]
   plugin: ospf_neighbor(nodes.core2.ospf.router_id)
 
 pfx_c1_ospf:
