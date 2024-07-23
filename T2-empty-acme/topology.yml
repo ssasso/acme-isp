@@ -17,8 +17,6 @@ _include:
 
 #### GROUP SETTINGS BELOW. Used to define modules and testing configuration.
 #### Comment this for normal workshop usage (or include only partial group config).
-###### BGP Policy tweaks:
-###### - we need to create, on border routers, fake med/local_preferences, to have a route-map attached to the neighbor config.
 groups:
   _include:
   - ../_include/_groups/*.yml
