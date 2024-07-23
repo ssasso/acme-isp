@@ -11,6 +11,7 @@ plugin: [ fix_frr, bgp.session, bgp.policy ]
 
 _include:
 - ../_include/addressing.yml
+- ../_include/routing.yml
 - ../_include/nodes.yml
 - ../_include/validate.yml
 
@@ -88,9 +89,8 @@ links:
   igw1:
     bgp:
       remove_private_as: true
-      # workaround: let's use prepend 1 just to generate route-maps that will be used for filtering
-      prepend.count: 1
-      locpref: 100
+      policy.out: acme_outbound
+      policy.in: locpref_100
   pool: t1_p2p
 
 ## transit 2 - policy: backup transit
@@ -98,21 +98,20 @@ links:
   igw2:
     bgp:
       remove_private_as: true
-      # workaround: since we used prepend 1 before, let's prepend 2 here
-      prepend.count: 2
-      locpref: 50
+      policy.out: acme_outbound_t2
+      policy.in: locpref_50
   pool: t2_p2p
 
 ## ixp - policy: this needs to be preferred over all transits.
 - ixp:
     bgp:
       remove_private_as: true
-      med: 20
-      locpref: 200
+      policy.out: acme_outbound
+      policy.in: locpref_200
   winsrt:
     bgp:
-      med: 20
-      locpref: 200
+      policy.out: local_as_only
+      policy.in: locpref_200
   ixp_rs:
   pool: ixp_lan
 
@@ -122,22 +121,20 @@ links:
 - corp1:
     bgp:
       advertise: true
-      # workaround: set a local pref to have netlab generate a route map where we can put input filters
-      locpref: 10
+      policy.in: cust_1_only
   c1rt:
     bgp:
-      med: 20
-      locpref: 200
+      policy.out: med_20
+      policy.in: locpref_200
   pool: acme_p2p_cust
 - corp2:
     bgp:
       advertise: true
-      # workaround: set a local pref to have netlab generate a route map where we can put input filters
-      locpref: 10
+      policy.in: cust_1_only
   c1rt:
     bgp:
-      med: 100
-      locpref: 100
+      policy.out: med_100
+      policy.in: locpref_100
   pool: acme_p2p_cust
 - c1rt:
     bgp.advertise: true
@@ -155,14 +152,12 @@ links:
 - transit1:
   winsrt:
     bgp:
-      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
-      med: 1
+      policy.out: local_as_only
   pool: t1_p2p
 - transit2:
   winsrt:
     bgp:
-      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
-      med: 1
+      policy.out: local_as_only
   pool: t2_p2p
 - winsrt:
     bgp.advertise: true
@@ -173,14 +168,12 @@ links:
 - transit1:
   nxrt:
     bgp:
-      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
-      med: 1
+      policy.out: local_as_only
   pool: t1_p2p
 - transit2:
   nxrt:
     bgp:
-      # workaround: set an arbitrary med > 0 just to create the route map used for filtering
-      med: 1
+      policy.out: local_as_only
   pool: t2_p2p
 - nxrt:
     bgp.advertise: true
@@ -188,6 +181,9 @@ links:
   pool: nx_lan
 
 # let's assume transit 1 and transit 2 are linked each other, like it happens for Tier 1 operators
+#  - but this link needs to have the lower priority, compared to direct customer connectivities
 - transit1:
+    bgp.locpref: 50
   transit2:
+    bgp.locpref: 50
   pool: t1_p2p

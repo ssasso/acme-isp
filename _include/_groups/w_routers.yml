@@ -1,6 +1,5 @@
 members: [ winsrt ]
-module: [ bgp ]
-config: [ extra ]
+module: [ bgp, routing ]
 bgp:
   as: 65040
   advertise_loopback: false
