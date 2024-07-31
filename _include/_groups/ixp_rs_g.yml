@@ -1,5 +1,5 @@
 members: [ ixp_rs ]
-module: [ bgp ]
+module: [ bgp, routing ]
 bgp:
   as: 64777
   rs: True

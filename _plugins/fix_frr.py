@@ -90,6 +90,11 @@ def post_transform(topology: Box) -> None:
         for i in rtr.interfaces:
           if 'ospf' in i:
             del i['ospf']
+      # Routing module stuff
+      if 'routing' in rtr:
+        rtr['routing'] = {
+          '_rm_per_af': True,
+        }
 
 def pre_transform(topology: Box) -> None:
   # remove non-needed groups

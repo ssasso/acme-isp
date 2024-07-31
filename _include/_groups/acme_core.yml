@@ -1,7 +1,7 @@
 members:
 - core1
 - core2
-module: [ ospf, bgp ]
+module: [ ospf, bgp, routing ]
 config: [ extra/bgp-add-path.j2 ]
 bgp:
   as: 64666

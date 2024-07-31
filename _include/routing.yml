@@ -1,0 +1,50 @@
+# Common routing module structure
+prefix:
+  acme_aggregate:
+  - ipv4: 100.100.0.0/20
+  acme_customer_1:
+  - ipv4: 100.100.15.0/24
+  wins_subnet:
+  - ipv4: 100.80.44.0/24
+  nx_lan:
+  - ipv4: 100.90.55.0/24
+aspath:
+  empty: ^$
+policy:
+  local_as_only:
+    - action: permit
+      match.aspath: empty
+    - action: deny
+  cust_1_only:
+    - action: permit
+      match.prefix: acme_customer_1
+    - action: deny
+  acme_outbound:
+    - action: permit
+      match:
+        prefix: acme_aggregate
+        aspath: empty
+    - action: deny
+  acme_outbound_t2:
+    - action: permit
+      match:
+        prefix: acme_aggregate
+        aspath: empty
+      set.prepend.count: 1
+    - action: deny
+  locpref_50:
+    set.locpref: 50
+  locpref_100:
+    set.locpref: 100
+  locpref_200:
+    set.locpref: 200
+  med_20:
+    - action: permit
+      match.aspath: empty
+      set.med: 20
+    - action: deny
+  med_100:
+    - action: permit
+      match.aspath: empty
+      set.med: 100
+    - action: deny

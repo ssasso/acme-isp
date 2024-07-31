@@ -3,4 +3,4 @@ device: frr
 provider: clab
 # when running on github codespaces we cannot use VRFs...
 devices.frr.clab.group_vars.netlab_mgmt_vrf: false
-devices.frr.clab.image: quay.io/frrouting/frr:7.5.0   # The last image that handles loopbacks correctly
+devices.frr.clab.image: quay.io/frrouting/frr:10.0.1
