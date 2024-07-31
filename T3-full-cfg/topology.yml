@@ -86,7 +86,6 @@ links:
 - transit1:
   igw1:
     bgp:
-      remove_private_as: true
       policy.out: acme_outbound
       policy.in: locpref_100
   pool: t1_p2p
@@ -95,7 +94,6 @@ links:
 - transit2:
   igw2:
     bgp:
-      remove_private_as: true
       policy.out: acme_outbound_t2
       policy.in: locpref_50
   pool: t2_p2p
@@ -103,7 +101,6 @@ links:
 ## ixp - policy: this needs to be preferred over all transits.
 - ixp:
     bgp:
-      remove_private_as: true
       policy.out: acme_outbound
       policy.in: locpref_200
   winsrt:
