@@ -71,12 +71,12 @@ c1_prefix:
 aspath_t1:
   description: Check correct AS-Path on Transit-1
   nodes: [ transit1 ]
-  plugin: bgp_prefix('100.100.0.0/20',aspath='64666 64666')
+  plugin: bgp_prefix('100.100.0.0/20',aspath='64666')
 
 aspath_t2:
   description: Check correct AS-Path on Transit-2
   nodes: [ transit2 ]
-  plugin: bgp_prefix('100.100.0.0/20',aspath='64666 64666 64666')
+  plugin: bgp_prefix('100.100.0.0/20',aspath='64666 64666')
 
 c1_best_out:
   description: Check correct Best Path from Customer-1 Router
@@ -106,7 +106,7 @@ best_to_nx:
 best_from_nx:
   description: Check correct Best Path FROM Newspaper-X
   nodes: [ nxrt ]
-  plugin: bgp_prefix('100.100.0.0/20',peer=nodes.transit1.bgp.router_id,aspath='65001 64666 64666',best=True)
+  plugin: bgp_prefix('100.100.0.0/20',peer=nodes.transit1.bgp.router_id,aspath='65001 64666',best=True)
 
 ping_wins:
   description: Pinging WINstagram Web Server

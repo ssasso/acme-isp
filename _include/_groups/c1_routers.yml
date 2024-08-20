@@ -1,5 +1,4 @@
 members: [ c1rt ]
-module: [ bgp ]
-config: [ extra ]
+module: [ bgp, routing ]
 bgp:
   as: 65535

@@ -1,6 +1,5 @@
 members: [ nxrt ]
-module: [ bgp ]
-config: [ extra ]
+module: [ bgp, routing ]
 bgp:
   as: 65050
   advertise_loopback: false
